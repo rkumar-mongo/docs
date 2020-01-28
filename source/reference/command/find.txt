@@ -57,7 +57,8 @@ The :dbcommand:`find` command has the following syntax:
          "noCursorTimeout": <bool>,
          "awaitData": <bool>,
          "allowPartialResults": <bool>,
-         "collation": <document>
+         "collation": <document>,
+         "allowDiskUse" : <bool>
       }
    )
 
@@ -329,9 +330,36 @@ The command accepts the following fields:
      - Optional. 
        
        .. include:: /includes/extracts/collation-option.rst
-       
-       
 
+
+
+   * - ``allowDiskUse``
+     
+     - boolean
+
+     - Optional. 
+
+       Set ``allowDiskUse`` to ``true`` to enables use of temporary 
+       files on disk for any data exceeding the 100 megabyte limit on 
+       explicit sort operations (i.e. sort operations which cannot
+       be resolved using an index). See :ref:`sort-index-use` for 
+       more information on explicit sort operations.
+
+       If MongoDB can satisfy the specified ``sort`` using an 
+       index, *or* if the explicit sort requires less than 100
+       megabytes of memory, MongoDB ignores this option.
+
+       If the explicit sort operation requires more than 100 megabytes
+       of system memory, MongoDB throws an error *unless* the 
+       ``find`` command specifies ``allowDiskUse: true``
+
+       For more complete documentation on ``allowDiskUse``, 
+       see :method:`cursor.allowDiskUse()`.
+
+       For more information on memory restrictions for large non-indexed
+       sorts, see :ref:`sort-index-use`.
+
+       .. versionadded:: 4.4
 
 
 Behavior

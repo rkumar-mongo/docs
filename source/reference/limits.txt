@@ -321,10 +321,23 @@ Operations
 
 .. _limit-sort:
 .. limit:: Sort Operations
+   
+   MongoDB can use indexes to implicitly obtain results for a
+   :method:`cursor.sort()` operation. For :method:`~cursor.sort()`
+   operations where MongoDB cannot scan an index to obtain the sort
+   order, MongoDB instead performs an explicit sort on the data set
+   subject to a limit of 100 megabytes of data to sort. For explicit
+   sort operations on more than 100 megabytes of data, MongoDB returns
+   an error *unless* the query specifies :method:`cursor.allowDiskUse()`
+   (*New in MongoDB 4.4*).
+   
+   .. versionchanged:: 4.4
+   
+      For MongoDB 4.2 and prior, the memory limit of explicit sort
+      operations was 32 megabytes.
 
-   If MongoDB cannot use an index to get documents in the requested
-   sort order, the combined size of all documents in the sort
-   operation, plus a small overhead, must be less than 32 megabytes.
+   For more information on sorts and index use, see
+   :ref:`sort-index-use`.
 
 .. _limit-agg-sort:
 

@@ -1,0 +1,94 @@
+=====================
+cursor.allowDiskUse()
+=====================
+
+.. default-domain:: mongodb
+
+.. contents:: On this page
+   :local:
+   :backlinks: none
+   :depth: 1
+   :class: singlecol
+
+Definition
+----------
+
+.. versionadded:: 4.4
+
+.. method:: cursor.allowDiskUse()
+
+
+   .. include:: /includes/fact-mongo-shell-method.rst
+
+
+
+   :method:`cursor.allowDiskUse()` enables use of temporary files
+   on disk for any data exceeding the 100 megabyte limit on explicit
+   :method:`cursor.sort` operations (i.e. sort operations which cannot
+   be resolved using an index). See :ref:`sort-index-use` for 
+   more information on explicit sort operations.
+
+   :method:`~cursor.allowDiskUse()` has the following form:
+
+   .. code-block:: javascript
+      
+      db.collection.find(<match>).sort(<sort>).allowDiskUse()
+
+Behavior
+--------
+
+Supports Large In-Memory Sorts Only
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+MongoDB can use indexes to implicitly obtain results for a
+:method:`cursor.sort()` operation. Without an index, MongoDB performs an
+explicit sort operation subject to a limit of 100 megabytes of data to
+sort. For explicit sort operations on more than 100 megabytes of data,
+MongoDB returns an error *unless* the query specfies
+:method:`cursor.allowDiskUse()`. 
+
+:method:`cursor.allowDiskUse()` has no effect on sort operations
+resolved using an index *or* explicit sort operations on less than 
+100 megabytes of data.
+
+To check if MongoDB must perform an explicit sort, append
+:method:`cursor.explain()` to the query and check the 
+:doc:`explain results </reference/explain-results>`. If the query plan 
+contains an explicit ``SORT`` stage, then MongoDB must perform an 
+explicit sort operation subject to the 100 megabyte memory limit.
+
+For more complete documentation on sorts and index use, see 
+:ref:`sort-index-use`.
+
+.. seealso:: :ref:`index-intersection-sort`
+
+Example
+-------
+
+Consider a collection ``sensors`` containing documents similar to the
+following:
+
+.. code-block:: json
+   :copyable: false
+
+   {
+     "sensor-name" : "TEMP-21425",
+     "sensor-location" : "Unit 12",
+     "reading" : {
+       "timestamp" : Timestamp(1580247215, 1),
+       "value" : 212,
+       "unit" : "Farenheit"
+     }
+   }
+
+The following operation includes a :method:`cursor.sort()` on the
+unindexed field ``reading.timestamp``. Since MongoDB must perform an
+explicit sort on the data *and* the amount of data to sort may exceed
+100 megabytes, the operation also includes
+:method:`cursor.allowDiskUse()` to support the large in-memory sort.
+
+.. code-block:: javascript
+
+   db.sensors.find({"sensor-location" : "Unit 12"}).
+     sort({"reading.timestamp" : 1}).
+     allowDiskUse()

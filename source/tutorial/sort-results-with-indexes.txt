@@ -13,12 +13,16 @@ Use Indexes to Sort Query Results
    :depth: 1
    :class: singlecol
 
-In MongoDB, sort operations can obtain the sort order by retrieving
-documents based on the ordering in an index. If the query planner
-cannot obtain the sort order from an index, it will sort the results in
-memory. Sort operations that use an index often have better performance
-than those that do not use an index. In addition, sort operations that
-do *not* use an index will abort when they use 32 megabytes of memory.
+MongoDB can use indexes to implicitly obtain the sort order for a
+:method:`~cursor.sort()` operation. For :method:`~cursor.sort()`
+operations where MongoDB cannot scan an index to obtain the sort order,
+MongoDB instead performs an explicit sort on the data set subject to a
+100 megabyte limit of data to sort. Sort operations that use an index
+often have better performance than those that do not use an index. 
+
+For explicit sort operations on more than 100 megabytes of data, MongoDB
+returns an error *unless* the query specifies
+:method:`cursor.allowDiskUse()` (*New in MongoDB 4.4*).
 
 .. note::
 

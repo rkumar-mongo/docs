@@ -40,13 +40,23 @@ $orderby
 Behavior
 --------
 
-The sort function requires that the entire sort be able to complete
-within 32 megabytes. When the sort option consumes more than 32
-megabytes, MongoDB will return an error.
+The sort function can use indexes to implicitly obtain the sort order
+For sort operations where MongoDB cannot scan an index to obtain the
+sort order, MongoDb instead performs an explicit sort on the data set
+subject to a 100 megabyte limit of data to sort. If the sort operation
+requires more than 100 megabytes of data, MongoDB will return an error
+*unless* the operation specifies :method:`cursor.allowDiskUse()` (*New
+in MongoDB 4.4*).
+
+.. versionchanged:: 4.4
+
+   Prior to MongoDB 4.4, the limit for sort operations without an
+   index was 32 megabytes. See
+   :ref:`4.4-rel-notes-sort-memory-limit`.
 
 To avoid this error, create an index to support the sort operation or
 use :operator:`$orderby` in conjunction with :method:`cursor.maxTimeMS()`
 and/or :method:`cursor.limit()`. The :method:`cursor.limit()` increases
 the speed and reduces the amount of memory required to return this
 query by way of an optimized algorithm. The specified limit must result
-in a number of documents that fall within the 32 megabyte limit.
+in a number of documents that fall within the 100 megabyte limit.

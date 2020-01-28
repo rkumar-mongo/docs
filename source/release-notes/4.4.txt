@@ -57,6 +57,62 @@ Deprecated Operators
 
 See :ref:`currentDate-example-agg` for an example.
 
+General Improvements
+--------------------
+
+.. _4.4-rel-notes-sort-memory-limit:
+
+Explicit Sort Limit Increased
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+For :method:`~cursor.sort()` operations where MongoDB cannot scan an
+index to obtain the sort order, MongoDB instead performs an explicit
+sort operation on the data. Starting in MongoDB 4.4, explicit sort
+operations have a 100 megabyte limit on the amount of data to sort.
+MongoDB 4.2 and earlier had a 32 megabyte limit on the amount of data to
+sort.
+
+Explicit sort operations which exceed the 100 megabyte limit return
+an error *unless* the operation includes the 
+:method:`cursor.allowDiskUse()` (*New in MongoDB 4.4*).
+
+For more information on sorting and index use, see
+:ref:`sort-index-use`.
+
+.. seealso:: 
+
+   | :method:`cursor.allowDiskUse()`
+   | :limit:`Memory Limits on Sort Operations <Sort Operations>`
+
+``allowDiskUse()`` Support for Queries with Large In-Memory Sorts
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 4.4
+
+:method:`cursor.allowDiskUse()` enables use of temporary files on disk
+for any data exceeding the 100 megabyte limit on explicit
+:method:`cursor.sort` operations (i.e. sort operations which cannot be
+resolved using an index). For explicit sort operations which require
+more than 100 megabytes of data, MongoDB returns an error *unless* the
+query specifies :method:`cursor.allowDiskUse()`.
+
+:method:`cursor.allowDiskUse()` has no effect on sort operations
+resolved using an index *or* explicit sort operations on less than 
+100 megabytes of data.
+
+If using the :dbcommand:`find` database command, specify the optional
+parameter ``allowDiskUse: true`` to allow disk use for explicit sorting
+operations.
+
+For instructions on enabling :method:`~cursor.allowDiskUse` for queries
+issued through a MongoDB driver, defer to the documentation for your
+preferred :ecosystem:`MongoDB 4.4-compatible driver </drivers>`. 
+
+.. seealso:: 
+
+   | :limit:`Memory Limits On Sort Operations <Sort Operations>`
+   | :ref:`sort-index-use`
+
 Changes Affecting Compatibility
 -------------------------------
 
