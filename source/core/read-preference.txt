@@ -232,9 +232,12 @@ Read Preference and Transactions
 Additional Considerations
 -------------------------
 
-For :doc:`aggregation pipeline </core/aggregation-pipeline>`
-operations, you must run on the primary if the pipeline includes either
-the :pipeline:`$out` stage or the :pipeline:`$merge` stage.
+Starting in MongoDB 4.4, clients using a MongoDB 4.4-compatible driver
+can issue aggregation pipelines that include the :pipeline:`$out` or
+:pipeline:`$merge` stage against a replica set :term:`secondary` by
+specifying a non-primary read preference (e.g. :readmode:`secondary`).
+See the documentation for :pipeline:`$out` / :pipeline:`$merge` for more
+information.
 
 For :dbcommand:`mapReduce` operations, only "inline"
 :dbcommand:`mapReduce` operations that do not write data support read

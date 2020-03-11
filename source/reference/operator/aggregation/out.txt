@@ -198,6 +198,60 @@ A :binary:`~bin.mongodump` started with :option:`--oplog
 that includes :pipeline:`$out` during the dump process. See
 :option:`mongodump --oplog <mongodump.--oplog>` for more information.
 
+.. _out-on-secondaries:
+
+``$out`` On Secondaries
+~~~~~~~~~~~~~~~~~~~~~~~
+
+.. admonition:: Requires ``featureCompatibilityVersion`` 4.4+
+   :class: note
+
+   The cluster must have :ref:`featureCompatibiltyVersion <set-fcv>` set
+   to at least ``4.4`` prior to issuing aggregation pipelines which
+   include :pipeline:`$out` against a secondary.
+
+Starting in MongoDB 4.4, clients can issue aggregation pipelines that
+include :pipeline:`$out` against :term:`secondaries <secondary>` in a
+replica set or sharded cluster. The secondaries route write operations
+associated with the :pipeline:`$out` stage to the appropriate replica
+set :term:`primary`. For example, an application running analytical
+aggregation pipelines on secondaries can persist the results of the
+pipeline on the primary using :pipeline:`$out`.
+
+The client issuing the aggregation operation **must**:
+
+- Use an official MongoDB 4.4-compatible :ecosystem:`driver </drivers>`.
+
+- Issue the aggregation operation with a non-primary 
+  :ref:`read preference <read-preference>` (e.g. :readmode:`secondary`).
+  Defer to your preferred :ecosystem:`driver's documentation </drivers>`
+  for syntax on how to configure read preference for the connection or
+  the aggregation operation.
+
+For replica sets, the secondary routes write operations associated with 
+the pipeline stage to the primary.
+
+For sharded clusters, :pipeline:`$out` only supports outputting to
+unsharded collections. If the source collection is sharded, then the
+:pipeline:`$out` executes on a secondary node belonging to the primary
+shard of the source collection. This means that the data is gathered on
+the source collection's primary shard for processing, and the resulting
+writes are then targeting to the primary node of the primary shard for
+the destination database.
+
+Aggregation operations that include :pipeline:`$out` have the
+following behaviors when issued against a secondary:
+
+- Clients do not :ref:`automatically retry <retryable-writes>` the
+  write operation if it fails.
+
+- The aggregation makes no attempt to recover if the primary steps down
+  during write operations associated with :pipeline:`$out`. The
+  aggregation fails and returns an error.
+
+Prior to MongoDB 4.4, aggregation pipelines issued against a secondary
+fail if they include the :pipeline:`$out` stage.
+
 Restrictions
 ~~~~~~~~~~~~
 

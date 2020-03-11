@@ -189,8 +189,12 @@ General Changes
 -------------------------
 
 Some features in 4.4 require not just the 4.4 binaries but the
-:ref:`featureCompatibilityVersion <view-fcv>` (fCV) set to 4.4. These
+:ref:`featureCompatibilityVersion <set-fcv>` (fCV) set to ``4.4``. These
 features include:
 
 - Raises the :limit:`Namespace Length` limit for MongoDB versions
   with fCV set to 4.4+.
+
+- Issuing aggregation pipelines that include 
+  :pipeline:`$merge` or :pipeline:`$out` with a non-primary 
+  :ref:`read preference <read-pref-summary>`.

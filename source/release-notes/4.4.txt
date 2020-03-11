@@ -111,6 +111,36 @@ New Aggregation Operators
 General Aggregation Improvements
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+``$out`` and ``$merge`` On Secondaries
+``````````````````````````````````````
+
+.. admonition:: Requires ``featureCompatibilityVersion`` 4.4+
+   :class: note
+
+   The cluster must have :ref:`featureCompatibiltyVersion <set-fcv>`
+   set to at least ``4.4`` prior to issuing aggregation pipelines which
+   include :pipeline:`$merge` or :pipeline:`$out` against a secondary.
+
+Starting in MongoDB 4.4, clients can issue aggregation pipelines that
+include :pipeline:`$merge` or :pipeline:`$out` against
+:term:`secondaries <secondary>` in a replica set or sharded cluster. The
+secondaries route write operations associated with the
+:pipeline:`$merge` or :pipeline:`$out` stage to the appropriate replica
+set :term:`primary`. For example, an application running analytical
+aggregation pipelines on secondaries can persist the results of the
+pipeline on the primary using :pipeline:`$merge` or 
+:pipeline:`$out`.
+
+Prior to MongoDB 4.4, aggregation pipelines issued against a secondary
+fail if they include the :pipeline:`$merge` or :pipeline:`$out` stage.
+
+For more complete documentation, see:
+
+- :ref:`merge-on-secondaries`
+- :ref:`out-on-secondaries`
+
+.. seealso:: :ref:`replica-set-read-preference-behavior`
+
 ``$out``
 ````````
 
